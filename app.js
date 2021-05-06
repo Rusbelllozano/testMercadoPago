@@ -1,22 +1,108 @@
 var express = require('express');
-var exphbs  = require('express-handlebars');
+var exphbs = require('express-handlebars');
+
 var port = process.env.PORT || 3000
 
 var app = express();
- 
-app.engine('handlebars', exphbs());
-app.set('view engine', 'handlebars');
+var mercadopago = require('mercadopago');
+mercadopago.configure({
+  access_token: 'APP_USR-2572771298846850-120119-a50dbddca35ac9b7e15118d47b111b5a-681067803',
+  integrator_id: 'dev_24c65fb163bf11ea96500242ac130004',
+});
 
+
+app.engine('hbs', exphbs({ extname: 'hbs' }));
+app.set('view engine', 'hbs');
+// app.use(express.bodyParser());
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }))
 app.use(express.static('assets'));
- 
+// app.use(app.router);
+
 app.use('/assets', express.static(__dirname + '/assets'));
 
 app.get('/', function (req, res) {
-    res.render('home');
+  res.render('home');
 });
-
 app.get('/detail', function (req, res) {
-    res.render('detail', req.query);
+  res.render('detail', req.query);
 });
 
+app.post('/checkout', function (req, res) {
+  // console.log(req.body)
+
+  var preference = {
+    items: [
+      {
+        title: req.body.title,
+        quantity: parseInt(req.body.unit),
+        picture_url: req.body.img,
+        currency_id: 'COP',
+        unit_price: parseInt(req.body.price)
+      }
+    ],
+    payer: {
+      "name": "Lalo",
+      "surname": "Landa",
+      "email": "test_user_83958037@testuser.com",
+      "phone": {
+        "area_code": "57",
+        "number": 3115137300
+      },
+      "identification": {
+        "type": "CC",
+        "number": "681094118"
+      },
+      "address": {
+        "street_name": "Insurgentes Sur",
+        "street_number": 1602,
+        "zip_code": "5700"
+      }
+    },
+    back_urls: {
+      "success": "https://rusbelllozano-mp-ecommerce.herokuapp.com/feedback",
+      "failure": "https://rusbelllozano-mp-ecommerce.herokuapp.com/feedback",
+      "pending": "https://rusbelllozano-mp-ecommerce.herokuapp.com/feedback"
+    },
+    auto_return: "approved",
+    payment_methods: {
+      "excluded_payment_methods": [
+        {
+          "id": "amex"
+        }
+      ],
+      "excluded_payment_types": [
+        {
+          "id": "atm"
+        }
+      ],
+      "installments": 6
+    },
+    notification_url: "https://rusbelllozano-mp-ecommerce.herokuapp.com/notification",
+    external_reference: "ventaA123",
+  };
+  // console.log(preference);
+  mercadopago.preferences.create(preference)
+    .then(function (response) {
+      console.log(response.body);
+      // Este valor reemplazará el string "<%= global.id %>" en tu HTML
+      res.redirect(response.body.init_point)
+      // global.id = response.body.id;
+    }).catch(function (error) {
+      console.log(error);
+    });
+});
+
+app.get('/feedback', function (request, response) {
+  response.json({
+    Payment: request.query.payment_id,
+    Status: request.query.status,
+    MerchantOrder: request.query.merchant_order_id
+  })
+});
+app.get('/notification', function (request, response) {
+  response.json({
+    ...request.body
+  })
+});
 app.listen(port);
