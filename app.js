@@ -60,10 +60,11 @@ app.post('/checkout', function (req, res) {
       }
     },
     back_urls: {
-      "success": "https://rusbelllozano-mp-ecommerce.herokuapp.com/feedback",
-      "failure": "https://rusbelllozano-mp-ecommerce.herokuapp.com/feedback",
-      "pending": "https://rusbelllozano-mp-ecommerce.herokuapp.com/feedback"
+      "success": "https://rusbelllozano-mp-ecommerce.herokuapp.com/approved",
+      "failure": "https://rusbelllozano-mp-ecommerce.herokuapp.com/failure",
+      "pending": "https://rusbelllozano-mp-ecommerce.herokuapp.com/pending"
     },
+    notification_url:"https://rusbelllozano-mp-ecommerce.herokuapp.com/notification",
     auto_return: "approved",
     payment_methods: {
       "excluded_payment_methods": [
@@ -78,13 +79,11 @@ app.post('/checkout', function (req, res) {
       ],
       "installments": 6
     },
-    notification_url: "https://rusbelllozano-mp-ecommerce.herokuapp.com/notification",
-    external_reference: "ventaA123",
+    external_reference: "ruslllozano@gmail.com",
   };
   // console.log(preference);
   mercadopago.preferences.create(preference)
     .then(function (response) {
-      console.log(response.body);
       // Este valor reemplazará el string "<%= global.id %>" en tu HTML
       res.redirect(response.body.init_point)
       // global.id = response.body.id;
@@ -93,16 +92,41 @@ app.post('/checkout', function (req, res) {
     });
 });
 
-app.get('/feedback', function (request, response) {
-  response.json({
-    Payment: request.query.payment_id,
-    Status: request.query.status,
-    MerchantOrder: request.query.merchant_order_id
-  })
+app.get('/approved', function (req, res) {
+  let datos = {
+    Payment: req.query.payment_id,
+    Status: req.query.status,
+    MerchantOrder: req.query.merchant_order_id
+  }
+  res.render('backurl-approved',datos)
 });
-app.get('/notification', function (request, response) {
-  response.json({
-    ...request.body
-  })
+app.get('/failure', function (req, res) {
+  let datos = {
+    Payment: req.query.payment_id,
+    Status: req.query.status,
+    MerchantOrder: req.query.merchant_order_id
+  }
+  res.render('backurl-failure',datos)
+});
+app.get('/pending', function (req, res) {
+  let datos = {
+    Payment: req.query.payment_id,
+    Status: req.query.status,
+    MerchantOrder: req.query.merchant_order_id
+  }
+  res.render('backurl-pending',datos)
+});
+app.post('/notification', function (req, res) {
+  if (req.method === "POST") {
+      let body = "";
+      req.on("data", chunk => {
+        body += chunk.toString();
+      });
+      req.on("end", () => {
+        console.log(body, "webhook response");
+        res.end("ok");
+      });
+    }
+    res.status(201);
 });
 app.listen(port);
