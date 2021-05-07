@@ -124,7 +124,7 @@ app.post('/notification', function (req, res) {
       });
       req.on("end", () => {
         console.log(body, "webhook response");
-        res.end("ok");
+        res.json(body);
       });
     }
     res.status(201);
