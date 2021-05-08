@@ -118,7 +118,9 @@ app.get('/pending', function (req, res) {
 });
 app.post('/notification', function (req, res) {
   if (req.method === "POST") {
-        res.json({req.body});
+        res.json({
+          body:req.body
+        });
     }
 });
 app.listen(port);
