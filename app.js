@@ -1,6 +1,6 @@
 var express = require('express');
 var exphbs = require('express-handlebars');
-
+const fs = require('fs')
 var port = process.env.PORT || 3000
 
 var app = express();
@@ -117,10 +117,9 @@ app.get('/pending', function (req, res) {
   res.render('backurl-pending',datos)
 });
 app.post('/notification', function (req, res) {
-  if (req.method === "POST") {
-        res.json({
-          body:req.body
-        });
-    }
+    fs.writeFileSync(path.join(__dirname,'./public/reswebhook.json'),JSON.stringify(req.body))
+    console.log(req.body)
+    res.status(201)
+    
 });
 app.listen(port);
