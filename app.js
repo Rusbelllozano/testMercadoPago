@@ -119,7 +119,7 @@ app.get('/pending', function (req, res) {
 });
 app.post('/notification', function (req, res) {
   console.log(req.body)
-    fs.writeFileSync(path.join(__dirname,'./public/reswebhook.json'),JSON.stringify(req.body))
+    fs.writeFileSync(path.join(__dirname,'/public/reswebhook.json'),JSON.stringify(req.body))
     console.log(req.body)
     res.status(201)
     
