@@ -118,15 +118,7 @@ app.get('/pending', function (req, res) {
 });
 app.post('/notification', function (req, res) {
   if (req.method === "POST") {
-      let body = "";
-      req.on("data", chunk => {
-        body += chunk.toString();
-      });
-      req.on("end", () => {
-        console.log(body, "webhook response");
-        res.json(body);
-      });
+        res.json({req.body});
     }
-    res.status(201);
 });
 app.listen(port);
