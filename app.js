@@ -35,7 +35,9 @@ app.post('/checkout', function (req, res) {
   var preference = {
     items: [
       {
+        id:'1234',
         title: req.body.title,
+        description:'Dispositivo móvil de Tienda e-commerce',
         quantity: parseInt(req.body.unit),
         picture_url: req.body.img,
         currency_id: 'COP',
@@ -47,8 +49,8 @@ app.post('/checkout', function (req, res) {
       "surname": "Landa",
       "email": "test_user_83958037@testuser.com",
       "phone": {
-        "area_code": "57",
-        "number": 3115137300
+        "area_code": "52",
+        "number": 5549737300
       },
       "identification": {
         "type": "CC",
@@ -57,7 +59,7 @@ app.post('/checkout', function (req, res) {
       "address": {
         "street_name": "Insurgentes Sur",
         "street_number": 1602,
-        "zip_code": "5700"
+        "zip_code": "03940"
       }
     },
     back_urls: {
